@@ -1,0 +1,704 @@
+/* Recruitment Form Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #FFFFFF;
+    color: #252525;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+.recruit_container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 24px;
+}
+
+.recruit_form-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.recruit_form-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #252525;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.recruit_form-subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    color: #666666;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.recruit_form-section {
+    margin-bottom: 40px;
+}
+
+.recruit_section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #252525;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recruit_section-icon {
+    width: 20px;
+    height: 20px;
+    color: #7fe0fe;
+}
+
+.recruit_form-grid {
+    display: grid;
+    gap: 24px;
+}
+
+.recruit_form-grid.recruit_two-col {
+    grid-template-columns: 1fr 1fr;
+}
+
+.recruit_form-field {
+    position: relative;
+}
+
+.recruit_form-field.recruit_full-width {
+    grid-column: 1 / -1;
+}
+
+.recruit_form-field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #252525;
+    margin-bottom: 8px;
+}
+
+.recruit_required::after {
+    content: " *";
+    color: #7fe0fe;
+    font-weight: 600;
+}
+
+.recruit_form-field input, 
+.recruit_form-field select, 
+.recruit_form-field textarea {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: #252525;
+    background-color: #FFFFFF;
+    transition: all 0.2s ease;
+}
+
+.recruit_form-field input:focus, 
+.recruit_form-field select:focus, 
+.recruit_form-field textarea:focus {
+    outline: none;
+    border-color: #7fe0fe;
+    box-shadow: 0 0 0 3px rgba(127, 224, 254, 0.1);
+}
+
+.recruit_form-field input::placeholder, 
+.recruit_form-field textarea::placeholder {
+    color: #999999;
+    font-weight: 400;
+}
+
+.recruit_form-field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23999999' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+.recruit_form-field select:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%237fe0fe' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+.recruit_form-field textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Skills input styles */
+.recruit_skills-container {
+    position: relative;
+}
+
+.recruit_skills-input-wrapper {
+    min-height: 56px;
+    padding: 12px 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    cursor: text;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    line-height: 1.4;
+}
+
+.recruit_skills-input-wrapper:focus-within {
+    border-color: #7fe0fe;
+    box-shadow: 0 0 0 3px rgba(127, 224, 254, 0.1);
+}
+
+.recruit_skill-tag {
+    background-color: #f3f4f6;
+    color: #374151;
+    padding: 4px 8px 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.recruit_skill-tag .remove-btn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.recruit_skill-tag .remove-btn:hover {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.recruit_skills-input {
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: #252525;
+    background: transparent;
+    flex: 1;
+    min-width: 120px;
+    height: 28px;
+    line-height: 28px;
+}
+
+.recruit_skills-input::placeholder {
+    color: #999999;
+    font-weight: 400;
+}
+
+.recruit_autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid #e5e5e5;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.recruit_autocomplete-dropdown.show {
+    display: block;
+}
+
+.recruit_autocomplete-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.recruit_autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.recruit_autocomplete-item:hover,
+.recruit_autocomplete-item.highlighted {
+    background-color: #f3f4f6;
+}
+
+.recruit_autocomplete-item .highlight {
+    background-color: #fef3c7;
+    font-weight: 600;
+}
+
+.recruit_checkbox-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 24px 0;
+}
+
+.recruit_checkbox-field input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: #7fe0fe;
+}
+
+.recruit_checkbox-field label {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+.recruit_file-upload {
+    border: 2px dashed #e5e5e5;
+    border-radius: 8px;
+    padding: 32px 24px;
+    text-align: center;
+    background-color: #fafafa;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.recruit_file-upload:hover {
+    border-color: #7fe0fe;
+    background-color: rgba(127, 224, 254, 0.05);
+}
+
+.recruit_file-upload.recruit_dragover {
+    border-color: #7fe0fe;
+    background-color: rgba(127, 224, 254, 0.1);
+}
+
+.recruit_file-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.recruit_file-upload-icon {
+    width: 32px;
+    height: 32px;
+    color: #7fe0fe;
+}
+
+.recruit_file-upload-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #252525;
+}
+
+.recruit_file-upload-subtext {
+    font-size: 14px;
+    color: #666666;
+}
+
+.recruit_file-selected {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background-color: rgba(127, 224, 254, 0.1);
+    border: 1px solid rgba(127, 224, 254, 0.3);
+    border-radius: 6px;
+    font-size: 14px;
+    color: #252525;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recruit_file-selected-icon {
+    width: 16px;
+    height: 16px;
+    color: #7fe0fe;
+}
+
+.recruit_submit-button {
+    background: linear-gradient(135deg, #7fe0fe 0%, #5bc5e8 100%);
+    color: #252525;
+    border: none;
+    padding: 16px 48px;
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: block;
+    margin: 48px auto 0;
+    min-width: 160px;
+    box-shadow: 0 2px 8px rgba(127, 224, 254, 0.2);
+}
+
+.recruit_submit-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(127, 224, 254, 0.3);
+}
+
+.recruit_submit-button:active {
+    transform: translateY(0);
+}
+
+.recruit_submit-button:disabled {
+    background: #e5e5e5;
+    color: #999999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.recruit_spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #999999;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.recruit_modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.recruit_modal-content {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 60px 40px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    position: relative;
+    transform: scale(0.8) translateY(20px);
+    animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
+}
+
+.recruit_modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f5f5f5;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out 2s forwards;
+}
+
+.recruit_modal-close:hover {
+    background: #e5e5e5;
+    transform: scale(1.1);
+}
+
+.recruit_modal-close svg {
+    width: 16px;
+    height: 16px;
+    stroke: #666666;
+    stroke-width: 2;
+}
+
+.recruit_modal-button {
+    background: linear-gradient(135deg, #7fe0fe 0%, #5bc5e8 100%);
+    color: #252525;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 24px;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out 2.2s forwards;
+}
+
+.recruit_modal-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(127, 224, 254, 0.3);
+}
+
+.recruit_success-animation {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 40px;
+    position: relative;
+    animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.recruit_success-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7fe0fe 0%, #5bc5e8 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(127, 224, 254, 0.3);
+}
+
+.recruit_success-circle::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(127, 224, 254, 0.3) 0%, rgba(91, 197, 232, 0.3) 100%);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.recruit_success-checkmark {
+    position: relative;
+    z-index: 2;
+    width: 80px;
+    height: 80px;
+}
+
+.recruit_success-checkmark svg {
+    width: 80px;
+    height: 80px;
+    stroke: #FFFFFF;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.recruit_success-checkmark .checkmark-path {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: drawCheckmark 0.8s ease-out 0.5s forwards;
+}
+
+.recruit_success-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #252525;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out 1.3s forwards;
+}
+
+.recruit_success-message {
+    font-size: 18px;
+    color: #666666;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out 1.5s forwards;
+}
+
+.recruit_success-submessage {
+    font-size: 16px;
+    color: #999999;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out 1.7s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideIn {
+    to {
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.3;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes drawCheckmark {
+    0% {
+        stroke-dashoffset: 24;
+    }
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.recruit_privacy-link {
+    color: #7fe0fe;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.recruit_privacy-link:hover {
+    text-decoration: underline;
+}
+
+.recruit_error-message {
+    color: #ef4444;
+    font-size: 14px;
+    margin-top: 6px;
+    display: none;
+}
+
+.recruit_field-error input,
+.recruit_field-error select,
+.recruit_field-error textarea {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.recruit_message {
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.recruit_error {
+    background: #fee;
+    color: #c33;
+    border: 1px solid #fcc;
+}
+
+.recruit_success {
+    background: #efe;
+    color: #363;
+    border: 1px solid #cfc;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .recruit_container {
+        padding: 40px 20px;
+    }
+    
+    .recruit_form-title {
+        font-size: 28px;
+    }
+    
+    .recruit_form-grid.recruit_two-col {
+        grid-template-columns: 1fr;
+    }
+    
+    .recruit_submit-button {
+        width: 100%;
+        margin: 32px 0 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .recruit_container {
+        padding: 32px 16px;
+    }
+    
+    .recruit_form-title {
+        font-size: 24px;
+    }
+    
+    .recruit_form-field input, 
+    .recruit_form-field select, 
+    .recruit_form-field textarea,
+    .recruit_skills-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
