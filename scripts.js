@@ -1,35 +1,11 @@
 console.log('Script starting...');
 
-var SKILLS_DATA = [
-    "2D Art", "3D Tracking", "3D Animation", "3D Artist", "3Dequalizer", "3Ds Max", 
-    "Adobe Photoshop", "Adobe Suite", "After Effects", "Animation", "Arnold", "Art Director", 
-    "Asset Artist", "Bidding", "Blender", "Budgeting", "Build Artist", "C++", 
-    "Camera Projection", "Cfx Muscle Solutions", "Cg Generalist", "Cg Integration", 
-    "Character Design", "Character Director", "Character Matchmove", "Clarisse", 
-    "Client Interaction", "Coding", "Colorist", "Compositing", "Compositing Lead", 
-    "Concept", "Creature Supervisor", "Data Wrangling", "Davinci", "Deadline", 
-    "Digital Artist", "Director", "Dmp Artist", "Editorial", "Environment", 
-    "Executive Producer", "Facility Management", "Film Experience", "Final Cut Pro", 
-    "Flame", "Fluid Simulation", "Fx", "Fx Artist", "Fx Lead", "Fx Supervisor", 
-    "Gaming", "Generalist", "Houdini", "Human Resources", "Illustrator", "Inferno", 
-    "Katana", "Layout", "Lead", "Leadership", "Lighting", "Lighting Artist", 
-    "Lighting Lead", "Lidar", "Look Development", "Lookdev", "Lustre", "Manager", 
-    "Mari", "Matchmove", "Matte Painting", "Maya", "Mentor", "Modelling", "Motion", 
-    "Motion Capture", "Mocha", "Nuke", "Paint", "Photography", "Photoshop", 
-    "Pipeline", "Pipeline Td", "Pipeline Tool", "Previs", "Producer", "Production", 
-    "Production Coordinator", "Project Management", "Python", "Qt", "R&D", "Renderer", 
-    "Rigging", "Rotoscoping", "Roto", "Set Supervision", "Shader", "Shotgun", 
-    "Silhouette", "Smoke", "Software", "Stereo", "Substance", "Supervising", 
-    "Supervisor", "Syntheyes", "Systems", "Td", "Tech", "Technical Director", 
-    "Texturing", "Tracking", "Unreal", "Vfx", "Vfx Producer", "Vfx Supervisor", 
-    "Video Editing", "Visual Effects", "Vray", "Zbrush", "Zeno"
-];
+var SKILLS_DATA = ["2D Art", "3D Tracking", "3D Animation", "3D Artist", "3Dequalizer", "3Ds Max", "Adobe Photoshop", "Adobe Suite", "After Effects", "Animation", "Arnold", "Art Director", "Asset Artist", "Bidding", "Blender", "Budgeting", "Build Artist", "C++", "Camera Projection", "Cfx Muscle Solutions", "Cg Generalist", "Cg Integration", "Character Design", "Character Director", "Character Matchmove", "Clarisse", "Client Interaction", "Coding", "Colorist", "Compositing", "Compositing Lead", "Concept", "Creature Supervisor", "Data Wrangling", "Davinci", "Deadline", "Digital Artist", "Director", "Dmp Artist", "Editorial", "Environment", "Executive Producer", "Facility Management", "Film Experience", "Final Cut Pro", "Flame", "Fluid Simulation", "Fx", "Fx Artist", "Fx Lead", "Fx Supervisor", "Gaming", "Generalist", "Houdini", "Human Resources", "Illustrator", "Inferno", "Katana", "Layout", "Lead", "Leadership", "Lighting", "Lighting Artist", "Lighting Lead", "Lidar", "Look Development", "Lookdev", "Lustre", "Manager", "Mari", "Matchmove", "Matte Painting", "Maya", "Mentor", "Modelling", "Motion", "Motion Capture", "Mocha", "Nuke", "Paint", "Photography", "Photoshop", "Pipeline", "Pipeline Td", "Pipeline Tool", "Previs", "Producer", "Production", "Production Coordinator", "Project Management", "Python", "Qt", "R&D", "Renderer", "Rigging", "Rotoscoping", "Roto", "Set Supervision", "Shader", "Shotgun", "Silhouette", "Smoke", "Software", "Stereo", "Substance", "Supervising", "Supervisor", "Syntheyes", "Systems", "Td", "Tech", "Technical Director", "Texturing", "Tracking", "Unreal", "Vfx", "Vfx Producer", "Vfx Supervisor", "Video Editing", "Visual Effects", "Vray", "Zbrush", "Zeno"];
 
 var SUPABASE_URL = 'https://rnrfjighvqevfjeulego.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJucmZqaWdodnFldmZqZXVsZWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk4MDkwMDIsImV4cCI6MjA1NTM4NTAwMn0.EtVRpwUoZXgSSN84aRTJifMov-jxZOcz0throxzd_cA';
 
 window.formLoadTime = Date.now();
-
 var selectedSkills = [];
 var currentHighlight = -1;
 var filteredSkills = [];
@@ -96,8 +72,7 @@ function showAutocomplete(query) {
     var dropdown = document.getElementById('autocompleteDropdown');
     
     filteredSkills = SKILLS_DATA.filter(function(skill) {
-        return skill.toLowerCase().includes(query.toLowerCase()) && 
-               !selectedSkills.includes(skill);
+        return skill.toLowerCase().includes(query.toLowerCase()) && !selectedSkills.includes(skill);
     }).slice(0, 8);
     
     if (filteredSkills.length === 0) {
@@ -109,15 +84,12 @@ function showAutocomplete(query) {
     filteredSkills.forEach(function(skill, index) {
         var item = document.createElement('div');
         item.className = 'recruit_autocomplete-item';
-        
         var regex = new RegExp('(' + escapeRegex(query) + ')', 'gi');
         var highlightedText = skill.replace(regex, '<span class="highlight">$1</span>');
         item.innerHTML = highlightedText;
-        
         item.addEventListener('click', function() {
             selectSkill(skill);
         });
-        
         dropdown.appendChild(item);
     });
     
@@ -287,7 +259,6 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.style.color = '#999999';
             
             var formData = new FormData(form);
-            
             var fullName = formData.get('fullName');
             var email = formData.get('email');
             var consent = formData.get('consent');
