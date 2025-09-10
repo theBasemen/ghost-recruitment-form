@@ -444,8 +444,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                         '</div>' +
                                     '</div>' +
                                     '<h2 class="recruit_success-title">Application Submitted Successfully!</h2>' +
-                                    '<p class="recruit_success-message">Thank you for your interest in joining our team. We have received your application and will review it carefully.</p>' +
-                                    '<p class="recruit_success-submessage">We will be in touch soon if your profile matches our current opportunities.</p>' +
+                                    '<p class="recruit_success-message">Thank you for sharing your details with us. We will hang on to your information, and look forward to getting in touch when the right opportunity arises.</p>' +
+                                    '<p class="recruit_success-submessage">To comply with GDPR, we’ll store your information for up to 2 years. If you would like your data removed, or have any other questions please write to jobs@ghostvfx.com</p>' +
                                     '<button class="recruit_modal-button" onclick="window.location.href=\'https://www.ghostvfx.com\'">' +
                                         'Continue to GhostVFX' +
                                     '</button>' +
