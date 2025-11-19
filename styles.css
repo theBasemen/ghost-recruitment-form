@@ -85,6 +85,13 @@ body {
     margin-bottom: 8px;
 }
 
+.recruit_char-counter {
+    font-weight: 400;
+    font-size: 12px;
+    color: #999999;
+    float: right;
+}
+
 .recruit_required::after {
     content: " *";
     color: #7fe0fe;
