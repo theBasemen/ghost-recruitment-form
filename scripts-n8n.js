@@ -6,6 +6,88 @@ console.log('Script starting...');
 // Your n8n webhook URL (already configured for your instance)
 var N8N_WEBHOOK_URL = 'https://basemen.app.n8n.cloud/webhook/fe300862-9d94-4db2-b153-8f432187df3f';
 
+// ===========================
+// INPUT SANITIZATION FUNCTIONS
+// ===========================
+
+// Sanitize text input to prevent JSON parsing errors
+function sanitizeTextInput(text) {
+    if (!text) return '';
+    
+    // Convert to string if not already
+    text = String(text);
+    
+    // Remove or replace problematic characters
+    // Keep emojis but ensure they're properly encoded
+    text = text
+        // Normalize line breaks
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        // Remove null bytes and other control characters (except newlines and tabs)
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+        // Replace smart quotes with regular quotes
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[\u201C\u201D]/g, '"')
+        // Trim excessive whitespace
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    
+    return text;
+}
+
+// Validate email format
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Validate URL format
+function validateURL(url) {
+    if (!url) return true; // URLs are optional
+    try {
+        new URL(url);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+// Sanitize and validate all form data
+function sanitizeFormData(data) {
+    const sanitized = {};
+    
+    // Text fields that need sanitization
+    const textFields = ['fullName', 'message', 'skills'];
+    textFields.forEach(field => {
+        if (data[field]) {
+            sanitized[field] = sanitizeTextInput(data[field]);
+        }
+    });
+    
+    // URL fields that need validation
+    const urlFields = ['website', 'linkedin', 'artstation', 'showreel'];
+    urlFields.forEach(field => {
+        if (data[field]) {
+            sanitized[field] = data[field].trim();
+            if (!validateURL(sanitized[field])) {
+                console.warn(`Invalid URL for ${field}: ${sanitized[field]}`);
+                sanitized[field] = ''; // Clear invalid URLs
+            }
+        }
+    });
+    
+    // Direct copy fields (already safe)
+    const safeFields = ['email', 'country', 'department', 'internship', 
+                       'experience', 'showreelPassword', 'source', 'timestamp'];
+    safeFields.forEach(field => {
+        if (data[field] !== undefined) {
+            sanitized[field] = data[field];
+        }
+    });
+    
+    return sanitized;
+}
+
 var SKILLS_DATA = [
     "2D Art", "3D Tracking", "3D Animation", "3D Artist", "3Dequalizer", "3Ds Max", 
     "Adobe Photoshop", "Adobe Suite", "After Effects", "Animation", "Arnold", "Art Director", 
@@ -252,6 +334,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     initializeSkillsInput();
     
+    // Character counter for message field
+    var messageField = document.getElementById('message');
+    var messageCounter = document.getElementById('messageCounter');
+    
+    if (messageField && messageCounter) {
+        function updateCharCounter() {
+            const currentLength = messageField.value.length;
+            const maxLength = 5000;
+            messageCounter.textContent = `(${currentLength}/${maxLength})`;
+            
+            // Change color when approaching limit
+            if (currentLength > maxLength * 0.9) {
+                messageCounter.style.color = '#ef4444';
+            } else {
+                messageCounter.style.color = '#999999';
+            }
+        }
+        
+        messageField.addEventListener('input', updateCharCounter);
+        messageField.addEventListener('paste', function() {
+            setTimeout(updateCharCounter, 10);
+        });
+        
+        // Initial update
+        updateCharCounter();
+    }
+    
     var fileUpload = document.getElementById('fileUpload');
     var fileInput = document.getElementById('resume');
     var fileSelected = document.getElementById('fileSelected');
@@ -331,15 +440,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.style.color = '';
             }
             
-            // Validation
+            // Enhanced Validation
             if (!fullName || !fullName.trim()) {
                 showMessage('Please enter your full name', 'error');
                 resetSubmitButton();
                 return;
             }
             
+            // Validate full name length
+            if (fullName.length > 100) {
+                showMessage('Full name is too long (max 100 characters)', 'error');
+                resetSubmitButton();
+                return;
+            }
+            
             if (!email || !email.trim()) {
                 showMessage('Please enter your email address', 'error');
+                resetSubmitButton();
+                return;
+            }
+            
+            // Validate email format
+            if (!validateEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                resetSubmitButton();
+                return;
+            }
+            
+            // Validate message length if provided
+            var message = formData.get('message');
+            if (message && message.length > 5000) {
+                showMessage('Your message is too long (max 5000 characters)', 'error');
                 resetSubmitButton();
                 return;
             }
@@ -376,8 +507,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Handle file upload and form submission
             async function submitApplication() {
                 try {
-                    // Prepare data for n8n webhook
-                    var webhookData = {
+                    // Prepare raw data for n8n webhook
+                    var rawData = {
                         fullName: formData.get('fullName'),
                         email: formData.get('email'),
                         country: formData.get('country') || '',
@@ -395,22 +526,30 @@ document.addEventListener('DOMContentLoaded', function() {
                         timestamp: new Date().toISOString()
                     };
                     
+                    // Sanitize all form data to prevent JSON errors
+                    var webhookData = sanitizeFormData(rawData);
+                    
                     // Handle file if selected
                     if (selectedFile) {
                         submitButton.innerHTML = '<span class="recruit_spinner"></span>Processing resume...';
                         
-                        // Convert file to base64 for transmission
-                        // n8n will handle the Airtable upload
-                        const base64 = await fileToBase64(selectedFile);
-                        webhookData.resumeBase64 = base64;
-                        webhookData.resumeFileName = selectedFile.name;
+                        try {
+                            // Convert file to base64 for transmission
+                            const base64 = await fileToBase64(selectedFile);
+                            webhookData.resumeBase64 = base64;
+                            webhookData.resumeFileName = selectedFile.name;
+                        } catch (fileError) {
+                            console.error('File processing error:', fileError);
+                            showMessage('Error processing resume file. Please try again or submit without the file.', 'error');
+                            // Continue without file rather than failing completely
+                        }
                     }
                     
                     submitButton.innerHTML = '<span class="recruit_spinner"></span>Submitting application...';
                     
                     console.log('Submitting to n8n webhook...');
                     
-                    // Submit to n8n webhook
+                    // Submit to n8n webhook with better error handling
                     const response = await fetch(N8N_WEBHOOK_URL, {
                         method: 'POST',
                         headers: {
@@ -422,8 +561,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('Response status:', response.status);
                     
                     if (response.ok) {
-                        const result = await response.json();
-                        console.log('Success!', result);
+                        // Try to parse JSON response, but handle gracefully if it fails
+                        let result = {};
+                        const contentType = response.headers.get('content-type');
+                        
+                        if (contentType && contentType.includes('application/json')) {
+                            try {
+                                result = await response.json();
+                                console.log('Success!', result);
+                            } catch (jsonError) {
+                                console.warn('Response is not valid JSON, but submission was successful');
+                                // Continue anyway since the response was OK
+                            }
+                        } else {
+                            // Non-JSON response but still successful
+                            const textResponse = await response.text();
+                            console.log('Success (non-JSON response):', textResponse);
+                        }
                         
                         // Show success modal
                         document.body.insertAdjacentHTML('beforeend', 
@@ -445,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     '</div>' +
                                     '<h2 class="recruit_success-title">Application Submitted Successfully!</h2>' +
                                     '<p class="recruit_success-message">Thank you for sharing your details with us. We will hang on to your information, and look forward to getting in touch when the right opportunity arises.</p>' +
-                                    '<p class="recruit_success-submessage">To comply with GDPR, we’ll store your information for up to 2 years. If you would like your data removed, or have any other questions please write to jobs@ghostvfx.com</p>' +
+                                    '<p class="recruit_success-submessage">To comply with GDPR, we'll store your information for up to 2 years. If you would like your data removed, or have any other questions please write to jobs@ghostvfx.com</p>' +
                                     '<button class="recruit_modal-button" onclick="window.location.href=\'https://www.ghostvfx.com\'">' +
                                         'Continue to GhostVFX' +
                                     '</button>' +
@@ -472,16 +626,36 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         }, 100);
                     } else {
-                        const errorData = await response.json().catch(() => ({}));
-                        console.error('Submit error:', errorData);
+                        // Handle non-OK responses
+                        let errorMessage = 'Failed to submit application. Please try again.';
                         
-                        // Check for specific errors
+                        try {
+                            const contentType = response.headers.get('content-type');
+                            if (contentType && contentType.includes('application/json')) {
+                                const errorData = await response.json();
+                                console.error('Submit error:', errorData);
+                                if (errorData.message) {
+                                    errorMessage = errorData.message;
+                                }
+                            } else {
+                                const textError = await response.text();
+                                console.error('Submit error (text):', textError);
+                            }
+                        } catch (parseError) {
+                            console.error('Could not parse error response:', parseError);
+                        }
+                        
+                        // Check for specific HTTP errors
                         if (response.status === 404) {
-                            throw new Error('Form submission endpoint not found. Please contact support.');
-                        } else if (response.status === 0 || !response.status) {
-                            throw new Error('Network error. Please check your connection and try again.');
+                            throw new Error('Form submission endpoint not found. Please contact support at jobs@ghostvfx.com');
+                        } else if (response.status === 413) {
+                            throw new Error('File too large. Please reduce file size and try again.');
+                        } else if (response.status === 400) {
+                            throw new Error('Invalid form data. Please check your inputs and try again.');
+                        } else if (response.status >= 500) {
+                            throw new Error('Server error. Please try again in a few moments.');
                         } else {
-                            throw new Error(errorData.message || 'Failed to submit application. Please try again.');
+                            throw new Error(errorMessage);
                         }
                     }
                 } catch (error) {
