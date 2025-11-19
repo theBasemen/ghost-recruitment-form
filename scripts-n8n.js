@@ -1,10 +1,15 @@
-console.log('Script starting...');
+// VERSION 2.0 - WITH ENHANCED ERROR HANDLING AND LOGGING
+console.log('===================================');
+console.log('Ghost Recruitment Form Script v2.0');
+console.log('Script starting at:', new Date().toISOString());
+console.log('===================================');
 
 // ===========================
 // N8N WEBHOOK CONFIGURATION
 // ===========================
 // Your n8n webhook URL (already configured for your instance)
 var N8N_WEBHOOK_URL = 'https://basemen.app.n8n.cloud/webhook/fe300862-9d94-4db2-b153-8f432187df3f';
+console.log('Webhook URL configured:', N8N_WEBHOOK_URL);
 
 // ===========================
 // INPUT SANITIZATION FUNCTIONS
@@ -12,10 +17,15 @@ var N8N_WEBHOOK_URL = 'https://basemen.app.n8n.cloud/webhook/fe300862-9d94-4db2-
 
 // Sanitize text input to prevent JSON parsing errors
 function sanitizeTextInput(text) {
+    console.log('[SANITIZE] Input text length:', text ? text.length : 0);
+    console.log('[SANITIZE] First 100 chars:', text ? text.substring(0, 100) : 'empty');
+    
     if (!text) return '';
     
     // Convert to string if not already
     text = String(text);
+    
+    const originalLength = text.length;
     
     // Remove or replace problematic characters
     // Keep emojis but ensure they're properly encoded
@@ -32,13 +42,18 @@ function sanitizeTextInput(text) {
         .replace(/\n{3,}/g, '\n\n')
         .trim();
     
+    console.log('[SANITIZE] Output text length:', text.length);
+    console.log('[SANITIZE] Characters removed:', originalLength - text.length);
+    
     return text;
 }
 
 // Validate email format
 function validateEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    const isValid = emailRegex.test(email);
+    console.log('[VALIDATE] Email validation:', email, '-> Valid:', isValid);
+    return isValid;
 }
 
 // Validate URL format
@@ -46,20 +61,24 @@ function validateURL(url) {
     if (!url) return true; // URLs are optional
     try {
         new URL(url);
+        console.log('[VALIDATE] URL valid:', url);
         return true;
     } catch {
+        console.log('[VALIDATE] URL invalid:', url);
         return false;
     }
 }
 
 // Sanitize and validate all form data
 function sanitizeFormData(data) {
+    console.log('[SANITIZE FORM] Starting sanitization of form data');
     const sanitized = {};
     
     // Text fields that need sanitization
     const textFields = ['fullName', 'message', 'skills'];
     textFields.forEach(field => {
         if (data[field]) {
+            console.log(`[SANITIZE FORM] Processing ${field}`);
             sanitized[field] = sanitizeTextInput(data[field]);
         }
     });
@@ -70,7 +89,7 @@ function sanitizeFormData(data) {
         if (data[field]) {
             sanitized[field] = data[field].trim();
             if (!validateURL(sanitized[field])) {
-                console.warn(`Invalid URL for ${field}: ${sanitized[field]}`);
+                console.warn(`[SANITIZE FORM] Invalid URL for ${field}: ${sanitized[field]}`);
                 sanitized[field] = ''; // Clear invalid URLs
             }
         }
@@ -85,6 +104,7 @@ function sanitizeFormData(data) {
         }
     });
     
+    console.log('[SANITIZE FORM] Sanitization complete');
     return sanitized;
 }
 
@@ -327,7 +347,11 @@ function fileToBase64(file) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded');
+    console.log('===================================');
+    console.log('[DOM] DOMContentLoaded event fired');
+    console.log('[DOM] Form version from HTML:', document.querySelector('.recruit_container').getAttribute('data-form-version'));
+    console.log('[DOM] Script version: 2.0');
+    console.log('===================================');
     
     // Capture source parameter on page load
     captureSourceParameter();
@@ -506,6 +530,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Handle file upload and form submission
             async function submitApplication() {
+                console.log('[SUBMIT] Starting application submission');
+                
                 try {
                     // Prepare raw data for n8n webhook
                     var rawData = {
@@ -526,20 +552,28 @@ document.addEventListener('DOMContentLoaded', function() {
                         timestamp: new Date().toISOString()
                     };
                     
+                    console.log('[SUBMIT] Raw data prepared');
+                    console.log('[SUBMIT] Message field preview:', rawData.message.substring(0, 200));
+                    
                     // Sanitize all form data to prevent JSON errors
                     var webhookData = sanitizeFormData(rawData);
+                    
+                    console.log('[SUBMIT] Data sanitized');
+                    console.log('[SUBMIT] Sanitized message preview:', webhookData.message.substring(0, 200));
                     
                     // Handle file if selected
                     if (selectedFile) {
                         submitButton.innerHTML = '<span class="recruit_spinner"></span>Processing resume...';
+                        console.log('[SUBMIT] Processing file:', selectedFile.name, 'Size:', selectedFile.size);
                         
                         try {
                             // Convert file to base64 for transmission
                             const base64 = await fileToBase64(selectedFile);
                             webhookData.resumeBase64 = base64;
                             webhookData.resumeFileName = selectedFile.name;
+                            console.log('[SUBMIT] File converted to base64 successfully');
                         } catch (fileError) {
-                            console.error('File processing error:', fileError);
+                            console.error('[SUBMIT] File processing error:', fileError);
                             showMessage('Error processing resume file. Please try again or submit without the file.', 'error');
                             // Continue without file rather than failing completely
                         }
@@ -547,7 +581,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     submitButton.innerHTML = '<span class="recruit_spinner"></span>Submitting application...';
                     
-                    console.log('Submitting to n8n webhook...');
+                    // Test JSON stringification before sending
+                    let jsonPayload;
+                    try {
+                        jsonPayload = JSON.stringify(webhookData);
+                        console.log('[SUBMIT] JSON stringified successfully, size:', jsonPayload.length, 'bytes');
+                    } catch (stringifyError) {
+                        console.error('[SUBMIT] JSON stringify error:', stringifyError);
+                        throw new Error('Failed to prepare data for submission. Please check your input for special characters.');
+                    }
+                    
+                    console.log('[SUBMIT] Sending to webhook:', N8N_WEBHOOK_URL);
                     
                     // Submit to n8n webhook with better error handling
                     const response = await fetch(N8N_WEBHOOK_URL, {
@@ -555,29 +599,52 @@ document.addEventListener('DOMContentLoaded', function() {
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(webhookData)
+                        body: jsonPayload
                     });
                     
-                    console.log('Response status:', response.status);
+                    console.log('[SUBMIT] Response received');
+                    console.log('[SUBMIT] Response status:', response.status);
+                    console.log('[SUBMIT] Response OK:', response.ok);
+                    console.log('[SUBMIT] Response headers:', response.headers);
                     
                     if (response.ok) {
+                        console.log('[SUBMIT] Response is OK, attempting to parse response body');
+                        
                         // Try to parse JSON response, but handle gracefully if it fails
                         let result = {};
                         const contentType = response.headers.get('content-type');
+                        console.log('[SUBMIT] Response content-type:', contentType);
                         
                         if (contentType && contentType.includes('application/json')) {
+                            console.log('[SUBMIT] Content type is JSON, attempting to parse');
                             try {
-                                result = await response.json();
-                                console.log('Success!', result);
+                                const responseText = await response.text();
+                                console.log('[SUBMIT] Response text received, length:', responseText.length);
+                                console.log('[SUBMIT] Response text preview:', responseText.substring(0, 200));
+                                
+                                if (responseText.trim()) {
+                                    result = JSON.parse(responseText);
+                                    console.log('[SUBMIT] JSON parsed successfully:', result);
+                                } else {
+                                    console.log('[SUBMIT] Response body is empty, treating as success');
+                                }
                             } catch (jsonError) {
-                                console.warn('Response is not valid JSON, but submission was successful');
+                                console.error('[SUBMIT] JSON parse error:', jsonError);
+                                console.warn('[SUBMIT] Response is not valid JSON, but submission was successful');
                                 // Continue anyway since the response was OK
                             }
                         } else {
                             // Non-JSON response but still successful
-                            const textResponse = await response.text();
-                            console.log('Success (non-JSON response):', textResponse);
+                            console.log('[SUBMIT] Non-JSON response, reading as text');
+                            try {
+                                const textResponse = await response.text();
+                                console.log('[SUBMIT] Text response:', textResponse);
+                            } catch (textError) {
+                                console.error('[SUBMIT] Error reading text response:', textError);
+                            }
                         }
+                        
+                        console.log('[SUBMIT] Submission successful, showing success modal');
                         
                         // Show success modal
                         document.body.insertAdjacentHTML('beforeend', 
@@ -627,22 +694,30 @@ document.addEventListener('DOMContentLoaded', function() {
                         }, 100);
                     } else {
                         // Handle non-OK responses
+                        console.log('[SUBMIT ERROR] Response not OK');
                         let errorMessage = 'Failed to submit application. Please try again.';
                         
                         try {
                             const contentType = response.headers.get('content-type');
+                            console.log('[SUBMIT ERROR] Error response content-type:', contentType);
+                            
                             if (contentType && contentType.includes('application/json')) {
-                                const errorData = await response.json();
-                                console.error('Submit error:', errorData);
-                                if (errorData.message) {
-                                    errorMessage = errorData.message;
+                                const errorText = await response.text();
+                                console.log('[SUBMIT ERROR] Error response text:', errorText);
+                                
+                                if (errorText.trim()) {
+                                    const errorData = JSON.parse(errorText);
+                                    console.error('[SUBMIT ERROR] Parsed error data:', errorData);
+                                    if (errorData.message) {
+                                        errorMessage = errorData.message;
+                                    }
                                 }
                             } else {
                                 const textError = await response.text();
-                                console.error('Submit error (text):', textError);
+                                console.error('[SUBMIT ERROR] Text error response:', textError);
                             }
                         } catch (parseError) {
-                            console.error('Could not parse error response:', parseError);
+                            console.error('[SUBMIT ERROR] Could not parse error response:', parseError);
                         }
                         
                         // Check for specific HTTP errors
@@ -659,7 +734,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 } catch (error) {
-                    console.error('Submit error:', error);
+                    console.error('===================================');
+                    console.error('[SUBMIT FATAL ERROR] Submission failed:', error);
+                    console.error('[SUBMIT FATAL ERROR] Error name:', error.name);
+                    console.error('[SUBMIT FATAL ERROR] Error message:', error.message);
+                    console.error('[SUBMIT FATAL ERROR] Error stack:', error.stack);
+                    console.error('===================================');
+                    
                     showMessage('Error: ' + error.message, 'error');
                     resetSubmitButton();
                 }
@@ -672,3 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 console.log('Script loaded successfully');
 console.log('n8n webhook URL:', N8N_WEBHOOK_URL);
+console.log('===================================');
+console.log('Ghost Recruitment Form v2.0 Ready');
+console.log('All event listeners attached');
+console.log('===================================');
